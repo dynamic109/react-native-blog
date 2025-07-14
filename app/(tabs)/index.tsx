@@ -1,55 +1,67 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { Image } from "expo-image";
+import { Platform, StyleSheet } from "react-native";
+import { HelloWave } from "@/components/HelloWave";
+import ParallaxScrollView from "@/components/ParallaxScrollView";
+import { ThemedText } from "@/components/ThemedText";
+import { ThemedView } from "@/components/ThemedView";
+import blogs from "@/data/data";
+import { BlogCard } from "@/components/BlogCard";
 
 export default function HomeScreen() {
+  const date = new Date();
+  const hour = date.getHours();
+  let greetings = "";
+
+  if (hour < 12) {
+    greetings = "Good Morning";
+  } else if (hour < 17) {
+    greetings = "Good Afternoon";
+  } else {
+    greetings = "Good Evening";
+  }
   return (
     <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
+      headerBackgroundColor={{ light: "#A1CEDC", dark: "#1A1D29" }}
       headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
+        <>
+          {" "}
+          <Image
+            source={require("@/assets/images/undraw_blog-post_f68f.svg")}
+            style={styles.logo}
+          />
+          <ThemedView style={styles.titleContainer}>
+            <ThemedText type="title">Share your story</ThemedText>
+            <ThemedText
+              type="subtitle"
+              style={{
+                textAlign: "center",
+                lineHeight: 30,
+              }}
+            >
+              Create, edit and share your thoughts with the world through
+              beautiful blog posts
+            </ThemedText>
+          </ThemedView>
+        </>
+      }
+    >
+      <ThemedView
+        style={{
+          gap: 8,
+        }}
+      >
+        <ThemedView style={{ flexDirection: "row", alignItems: "center" }}>
+          <ThemedText type="defaultSemiBold">{greetings}</ThemedText>
+          <HelloWave />
+        </ThemedView>
+        <>
+          <ThemedText type="subtitle">Read recent blog posts</ThemedText>
+        </>
       </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
+      <ThemedView style={{ gap: 24 }}>
+        {blogs.map((blog) => (
+          <BlogCard key={blog.id} {...blog} />
+        ))}
       </ThemedView>
     </ParallaxScrollView>
   );
@@ -57,19 +69,24 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+    marginTop: 80,
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 12,
+    backgroundColor: "transparent",
+    textAlign: "center",
+    zIndex: 50,
   },
   stepContainer: {
     gap: 8,
     marginBottom: 8,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
+  logo: {
+    height: 250,
+    width: "0%",
     bottom: 0,
     left: 0,
-    position: 'absolute',
+    position: "absolute",
   },
 });
