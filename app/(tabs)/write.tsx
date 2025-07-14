@@ -1,110 +1,167 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { Button, ScrollView, StyleSheet, TextInput, Image } from "react-native";
+import { ThemedText } from "@/components/ThemedText";
+import { ThemedView } from "@/components/ThemedView";
+import { useState } from "react";
+import * as ImagePicker from "expo-image-picker";
+import Animated from "react-native-reanimated";
 
-import { Collapsible } from '@/components/Collapsible';
-import { ExternalLink } from '@/components/ExternalLink';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { IconSymbol } from '@/components/ui/IconSymbol';
+type BlogDataProps = {
+  author: string;
+  title: string;
+  content: string;
+  tags: string[];
+  imageUrl: string;
+  // date: Date;
+};
 
 export default function TabTwoScreen() {
+  const [blogData, setBlogData] = useState<BlogDataProps>({
+    author: "",
+    title: "",
+    content: "",
+    tags: [],
+    imageUrl: "",
+  });
+  const inputsData = [
+    {
+      label: "Title",
+      placeholder: "Enter blog title",
+    },
+    {
+      label: "Author",
+      placeholder: "Enter author name",
+    },
+    {
+      label: "Content",
+      placeholder: "Write your blog contents here...",
+    },
+    {
+      label: "Tags",
+      placeholder: "e.g. React Native, Mobile, JavaScript",
+    },
+  ];
+
+  const pickImage = async () => {
+    // Ask for permission
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+      alert("Permission to access media library is required!");
+      return;
+    }
+
+    // Launch image picker
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setBlogData({
+        ...blogData,
+        imageUrl: result.assets[0].uri, // Save the image URI
+      });
+    }
+  };
+
+  const handleChange = (e: any, input: any) => {
+    const value = e.nativeEvent.text;
+    if (input.label.toLowerCase() === "tags") {
+      setBlogData({
+        ...blogData,
+        tags: value.split(",").map((tag: any) => tag.trim()),
+      });
+    } else {
+      setBlogData({
+        ...blogData,
+        [input.label.toLowerCase()]: value,
+      });
+    }
+  };
+
+  const handleSubmit = () => {
+    console.log("Blog Data Submitted:", blogData);
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="chevron.left.forwardslash.chevron.right"
-          style={styles.headerImage}
-        />
-      }>
+    <Animated.ScrollView contentContainerStyle={styles.container}>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Explore</ThemedText>
+        <ThemedText type="title">Create New Blog</ThemedText>
       </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
-        </ThemedText>
-        <Image source={require('@/assets/images/react-logo.png')} style={{ alignSelf: 'center' }} />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Custom fonts">
-        <ThemedText>
-          Open <ThemedText type="defaultSemiBold">app/_layout.tsx</ThemedText> to see how to load{' '}
-          <ThemedText style={{ fontFamily: 'SpaceMono' }}>
-            custom fonts such as this one.
-          </ThemedText>
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/versions/latest/sdk/font">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user&apos;s current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful <ThemedText type="defaultSemiBold">react-native-reanimated</ThemedText>{' '}
-          library to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
-            </ThemedText>
-          ),
-        })}
-      </Collapsible>
-    </ParallaxScrollView>
+      <ThemedView style={styles.inputsContainer}>
+        {inputsData.map((input, index) => (
+          <ThemedView
+            style={{ backgroundColor: "transparent", gap: 2 }}
+            key={index}
+          >
+            <ThemedText style={styles.label}>{input.label}</ThemedText>
+            <TextInput
+              value={
+                input.label.toLowerCase() === "title"
+                  ? blogData.title
+                  : input.label.toLowerCase() === "author"
+                  ? blogData.author
+                  : input.label.toLowerCase() === "content"
+                  ? blogData.content
+                  : input.label.toLowerCase() === "tags"
+                  ? blogData.tags.join(", ")
+                  : ""
+              }
+              onChange={(e) => handleChange(e, input)}
+              style={[
+                styles.input,
+                input.label === "Content" && { height: 120 },
+              ]}
+              placeholder={input.placeholder}
+            />
+          </ThemedView>
+        ))}
+        <ThemedView style={{ marginBottom: 20 }}>
+          <Button title="Choose Image" onPress={pickImage} />
+          {blogData.imageUrl && (
+            <Image
+              source={{ uri: blogData.imageUrl }}
+              style={styles.imagePreview}
+              resizeMode="cover"
+            />
+          )}
+        </ThemedView>
+        <Button onPress={handleSubmit} title="Create Blog Post" />
+      </ThemedView>
+    </Animated.ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
+  container: {
+    marginTop: 80,
+    justifyContent: "center",
+    alignItems: "center",
   },
   titleContainer: {
-    flexDirection: 'row',
-    gap: 8,
+    backgroundColor: "transparent",
+  },
+  inputsContainer: {
+    marginTop: 100,
+    width: "100%",
+    paddingHorizontal: 24,
+    backgroundColor: "transparent",
+    gap: 24,
+  },
+  label: {
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  input: {
+    borderColor: "#ccc",
+    borderWidth: 1,
+    padding: 10,
+    borderRadius: 6,
+    backgroundColor: "#fff",
+  },
+  imagePreview: {
+    width: "100%",
+    height: 200,
+    borderRadius: 10,
   },
 });
