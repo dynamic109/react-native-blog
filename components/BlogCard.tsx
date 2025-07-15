@@ -1,7 +1,8 @@
-import { StyleSheet } from "react-native";
+import { Button, StyleSheet } from "react-native";
 import { Image } from "expo-image";
 import { ThemedView } from "./ThemedView";
 import { ThemedText } from "./ThemedText";
+import { useRouter } from "expo-router";
 
 export type BlogCardProps = {
   content: string;
@@ -22,9 +23,20 @@ export const BlogCard = ({
   imageUrl,
   tags,
 }: BlogCardProps) => {
+  const router = useRouter();
   return (
     <ThemedView id={id} style={styles.blogContainer}>
-      <Image source={imageUrl} alt={`${title} image`} />
+      <Image
+        source={imageUrl}
+        onError={(e) => console.log("Image failed to load:", e)}
+        accessibilityLabel={`${title} image`}
+        style={{
+          width: "100%",
+          height: 200,
+          borderRadius: 10,
+          backgroundColor: "#ccc", // helpful as fallback
+        }}
+      />
       <ThemedView style={styles.textContainer}>
         <ThemedView
           style={{ gap: 8, flexDirection: "row", backgroundColor: "#ffffff" }}
@@ -44,6 +56,14 @@ export const BlogCard = ({
             </ThemedText>
           ))}
         </ThemedView>
+        <ThemedView>
+          <Button
+            onPress={() =>
+              router.push({ pathname: "/screens/BlogDetails", params: { id } })
+            }
+            title="Read More"
+          />
+        </ThemedView>
       </ThemedView>
     </ThemedView>
   );
@@ -52,11 +72,16 @@ export const BlogCard = ({
 const styles = StyleSheet.create({
   blogContainer: {
     backgroundColor: "#ffffff",
-    boxShadow: "8px 8px 16px black",
     borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
+
   textContainer: {
     backgroundColor: "#ffffff",
     paddingHorizontal: 8,

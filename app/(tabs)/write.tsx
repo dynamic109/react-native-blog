@@ -1,9 +1,11 @@
-import { Button, ScrollView, StyleSheet, TextInput, Image } from "react-native";
+import { Button, StyleSheet, TextInput, Image, Pressable } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 import Animated from "react-native-reanimated";
+import { Ionicons } from "@expo/vector-icons";
+import { inputsData } from "@/data/data";
 
 type BlogDataProps = {
   author: string;
@@ -11,10 +13,10 @@ type BlogDataProps = {
   content: string;
   tags: string[];
   imageUrl: string;
-  // date: Date;
 };
 
 export default function TabTwoScreen() {
+  const [isImageSelected, setIsImageSelected] = useState(false);
   const [blogData, setBlogData] = useState<BlogDataProps>({
     author: "",
     title: "",
@@ -22,34 +24,14 @@ export default function TabTwoScreen() {
     tags: [],
     imageUrl: "",
   });
-  const inputsData = [
-    {
-      label: "Title",
-      placeholder: "Enter blog title",
-    },
-    {
-      label: "Author",
-      placeholder: "Enter author name",
-    },
-    {
-      label: "Content",
-      placeholder: "Write your blog contents here...",
-    },
-    {
-      label: "Tags",
-      placeholder: "e.g. React Native, Mobile, JavaScript",
-    },
-  ];
 
   const pickImage = async () => {
-    // Ask for permission
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
       alert("Permission to access media library is required!");
       return;
     }
 
-    // Launch image picker
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
@@ -59,8 +41,9 @@ export default function TabTwoScreen() {
     if (!result.canceled) {
       setBlogData({
         ...blogData,
-        imageUrl: result.assets[0].uri, // Save the image URI
+        imageUrl: result.assets[0].uri,
       });
+      setIsImageSelected(true);
     }
   };
 
@@ -117,16 +100,49 @@ export default function TabTwoScreen() {
           </ThemedView>
         ))}
         <ThemedView style={{ marginBottom: 20 }}>
-          <Button title="Choose Image" onPress={pickImage} />
-          {blogData.imageUrl && (
-            <Image
-              source={{ uri: blogData.imageUrl }}
-              style={styles.imagePreview}
-              resizeMode="cover"
-            />
+          {isImageSelected ? (
+            blogData.imageUrl && (
+              <ThemedView>
+                <Image
+                  source={{ uri: blogData.imageUrl }}
+                  style={styles.imagePreview}
+                  resizeMode="cover"
+                />
+                <Pressable
+                  style={{
+                    backgroundColor: "red",
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    marginTop: 10,
+                  }}
+                  onPress={() => setIsImageSelected(false)}
+                >
+                  <ThemedText> Remove Image</ThemedText>
+                  <Ionicons name="close-sharp" size={24} color="#fff" />
+                </Pressable>
+              </ThemedView>
+            )
+          ) : (
+            <Pressable style={styles.imageButton} onPress={pickImage}>
+              <Ionicons name="camera" size={100} color="#fff" />
+              <ThemedText style={{ backgroundColor: "transparent" }}>
+                Choose Image
+              </ThemedText>
+            </Pressable>
           )}
         </ThemedView>
-        <Button onPress={handleSubmit} title="Create Blog Post" />
+        <Pressable
+          onPress={handleSubmit}
+          style={{
+            backgroundColor: "blue",
+            paddingVertical: 10,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <ThemedText>Create Blog Post</ThemedText>
+        </Pressable>
       </ThemedView>
     </Animated.ScrollView>
   );
@@ -147,6 +163,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     backgroundColor: "transparent",
     gap: 24,
+    height: 900,
   },
   label: {
     fontWeight: "bold",
@@ -158,6 +175,13 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 6,
     backgroundColor: "#fff",
+  },
+  imageButton: {
+    // display: isImageSelected ? "none" : "flex",
+    backgroundColor: "transparent",
+    height: "auto",
+    flexDirection: "row",
+    alignItems: "center",
   },
   imagePreview: {
     width: "100%",
